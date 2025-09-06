@@ -4,7 +4,8 @@ POKEMONS=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 BASE_URL="https://pokeapi.co/api/v2/pokemon"
 #Delay between requests to avoid rate limiting
 DELAY=2
-Retry=3
+Retry_count=3
+SUCCESS=false
 #LOOP
 for POKEMON in "${POKEMONS[@]}";do
 #convert name to lowercase for api endpoint
@@ -18,6 +19,7 @@ HTTP_STATUS=$(curl -s -w "%{http_code}" -o "$OUTPUT" "$BASE_URL/$NAME_LOWER")
 if [ "$HTTP_STATUS" -eq 200 ]; then
     echo "Saved $POKEMON data to $OUTPUT"
 else 
+     Retry_count=$((Retry_count + 1))
     echo "Error fetching $POKEMON (HTTP $HTTP_STATUS)"
     echo "$POKEMON - HTTP $HTTP_STATUS" >> errors.txt
     rm -f "$OUTPUT" #remove incomplete file
