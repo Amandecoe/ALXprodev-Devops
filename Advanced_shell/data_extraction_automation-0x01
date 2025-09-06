@@ -1,8 +1,8 @@
 #!/bin/bash
 FILE="data.json"
 name=$(jq -r '.name' "$FILE" | sed 's/.*/\u&/') #capitalize first letter
-height=$(jq -r '.height' "$FILE" | awk '{printf "%.1f",$1/10}') #convert decimeter to meters
-weight=$(jq -r '.weight' "$FILE" | awk '{printf "%.0f",$1/10}') # Convert hectograms to kg
+formatted_height=$(jq -r '.height' "$FILE" | awk '{printf "%.1f",$1/10}') #convert decimeter to meters
+formatted_weight=$(jq -r '.weight' "$FILE" | awk '{printf "%.0f",$1/10}') # Convert hectograms to kg
 type=$(jq -r '.types[].type.name' "$FILE" | sed 's/.*/\u&/' | paste -sd "/" -) #join multiple types
-echo "$name is a type of $type, weights ${weight}kg, and is ${height}m takk"
+echo "$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall"
 
