@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#pokemon list
+POKEMONS=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
+BASE_URL="https://pokeapi.co/api/v2/pokemon"
+
+#function to fetch a single pokemon 
+fetch_pokemon(){
+    POKEMON="$1"
+    NAME_LOWER=$(echo "$POKEMON" | tr '[:upper:]' '[:lower:]')
+    OUTPUT="${NAME_LOWER}.json"
+
+    echo "Fetching data for $POKEMON..."
+
+    HTTP_STATUS=$(curl -s -w "%{http_code}" -o "$OUTPUT" "$BASE_URL/$NAME_LOWER")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "saved $POKEMON data to $OUTPUT"
+    else
+        echo "Error Fetching ${POKEMON} (HTTP ${HTTP_STATUS})"
+        echo "$POKEMON -HTTP $HTTP_STATUS" >> errors.txt
+        rm -f "$OUTPUT"
+        fi
+}
+
+#export function so subshells can use it 
+export -f fetch_pokemon
+export BASE_URL
+
+#Running all fetches in parallel
+for POKEMON in "${POKEMONS[@]}"; do 
+    fetch_pokemon "$POKEMON" &
+done
+
+#wait for background jobs to fininsh
+wait
+
+echo "All pokemon data fetched in parallel"
+
